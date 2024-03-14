@@ -1,4 +1,4 @@
-const asynHandler = (requestHandler) => {
+const asyncHandler = (requestHandler) => {
   return (req, res, next) => {
     Promise.resolve(requestHandler(req, res, next)).catch((error) =>
       next(error)
@@ -6,7 +6,7 @@ const asynHandler = (requestHandler) => {
   };
 };
 
-export { asynHandler };
+export { asyncHandler };
 
 // const asynHandleer = (func) => async (req,res,next) => {
 //   try {

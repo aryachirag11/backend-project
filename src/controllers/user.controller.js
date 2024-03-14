@@ -1,4 +1,4 @@
-import { asynHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
@@ -22,7 +22,7 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
-const registerUser = asynHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
   const { username, email, fullname, password } = req.body;
   // console.log("email:", email);
@@ -87,7 +87,7 @@ const registerUser = asynHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
-const loginUser = asynHandler(async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   //req body->data
   const { email, username, password } = req.body;
 
