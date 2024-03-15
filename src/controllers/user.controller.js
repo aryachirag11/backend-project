@@ -45,8 +45,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //check for images
   // check for avatar
-  const avatarLocalPath = req.files?.avatar[0]?.path;
+  // const avatarLocalPath = req.files?.avatar[0]?.path;
   // const coverImageLocalPath = req.files?.coverIamge[0]?.path;
+  let avatarLocalPath;
+  if (
+    req.files &&
+    Array.isArray(req.files.avatar) &&
+    req.files.avatar.length > 0
+  ) {
+    avatarLocalPath = req.files.avatar[0].path;
+  }
   let coverImageLocalPath;
   if (
     req.files &&
@@ -102,8 +110,11 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!existedUser) throw new ApiError(404, "User doesn't exists");
 
   //password check
-  const isPasswordValid = await existedUser.isCorrectPassword(password);
-  if (!isPasswordValid) throw new ApiError(401, "Invalid user credentials");
+  const isPasswordValid = await existedUser.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid user credentials");
+  }
 
   //access and refresh token
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
