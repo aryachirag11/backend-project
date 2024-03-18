@@ -229,7 +229,9 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
 
-  return res.status(200).json(new ApiError(400, {}, "Invalid old password"));
+  return res
+    .status(200)
+    .json(new ApiError(400, {}, "Password changed successfully"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -243,7 +245,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
   if (!(fullname || email)) throw new ApiError(400, "All fields are required");
 
-  User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
@@ -265,7 +267,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
-
+  // TODO: create a utlity to delete the old avatar
   if (!avatar.url) throw new ApiError(400, "error while uploading avatar");
 
   const user = await User.findByIdAndUpdate(
