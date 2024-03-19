@@ -313,7 +313,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
-  if (!username?.trim()) throw new ApiError(400, "username is missing");
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "username is missing");
+  }
 
   const channel = await User.aggregate([
     {
@@ -339,7 +342,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        subscriberCount: {
+        subscribersCount: {
           $size: "$subscribers",
         },
         channelsSubscribedToCount: {
@@ -348,7 +351,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         isSubscribed: {
           $cond: {
             if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-            the: true,
+            then: true,
             else: false,
           },
         },
@@ -358,7 +361,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       $project: {
         fullname: 1,
         username: 1,
-        subscriberCount: 1,
+        subscribersCount: 1,
         channelsSubscribedToCount: 1,
         isSubscribed: 1,
         avatar: 1,
@@ -368,7 +371,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
   ]);
 
-  if (!channel?.length) throw new ApiError(404, "Channel does not exists");
+  if (!channel?.length) {
+    throw new ApiError(404, "channel does not exists");
+  }
 
   return res
     .status(200)
@@ -389,14 +394,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         from: "videos",
         localField: "watchHistory",
         foreignField: "_id",
-        res: "watchHistory",
+        as: "watchHistory",
         pipeline: [
           {
             $lookup: {
               from: "users",
               localField: "owner",
               foreignField: "_id",
-              res: "owner",
+              as: "owner",
               pipeline: [
                 {
                   $project: {
@@ -419,14 +424,14 @@ const getWatchHistory = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  // if (!user?.length) throw new ApiError(404, "User does not exist");
+
   return res
     .status(200)
     .json(
       new ApiResponse(
         200,
         user[0].watchHistory,
-        "Watch History fetched successfully"
+        "Watch history fetched successfully"
       )
     );
 });
